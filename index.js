@@ -38,7 +38,7 @@ var MVVM = (function(root){
 	};
 
 	MVVM.prototype.addFunction = function(){
-		
+		var functionArr = [];
 	}
 
 	return MVVM;
