@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>example</title>
+  <script src="./index.js" charset="utf-8"></script>
+  <!--<script src="https://unpkg.com/vue/dist/vue.js" charset="utf-8"></script>-->
+</head>
+<body>
+  <div id="mvvm">
+    <h2>{{b}}</h2>
+    <input type="text" x-model="a">
+    <input type="text" name="" value="" x-model="a">
+    <p x-html="a">{{ a }}</p>
+    <button type="button" name="button" x-on:click="testToggle">change b</button>
+  </div>
+</body>
+<script>
+var vm = new MVVM({
+  el: '#mvvm',
+  data: {
+    a: 'test model',
+    b: 'hello MVVM',
+    flag: true,
+    arr: [1 ,2 ,3],
+    obj: {name: "ccc", pwd: 123}
+  },
+  methods: {
+    testToggle: function () {
+      this.flag = !this.flag;
+      this.b = this.flag ? 'hello MVVM' : 'test success'
+    }
+  }
+});
+
+
+// var vue = new Vue({
+//   el: '#mvvm',
+//   data: {
+//     a: 'test model',
+//     b: 'hello MVVM',
+//     flag: true,
+//     arr: [1 ,2 ,3]
+//   },
+//   methods: {
+//     testToggle: function () {
+//       this.flag = !this.flag;
+//       this.b = this.flag ? 'hello MVVM' : 'test success'
+//     }
+//   }
+// });
+</script>
+</html>
