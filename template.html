@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <h1>{{title}}</h1>
+        <!-- <ul>
+            <li v-for="text in texts">{{text}}</li>
+        </ul> -->
+        <h2>{{message}}</h2>
+        <div>
+            重新加载一下title数据
+            <p>
+                {{ title }}
+            </p>
+        </div>
+        <h3 v-if="isShow">{{showText}}</h3>
+    </div>
+    <!-- <script type="text/javascript" src="js/vue.js"></script> -->
+    <script>
+        var model = {
+            title : "this is vue title",
+            message : "this is message",
+            showText : "你有时候看不到这个东西",
+            isShow : false
+        }
+        function observerFactory(model){
+            for(var property in model){
+                addObserver(model,property,model[property]);
+                if(model[property] instanceof Array){
+                    //如果是数组，数组的某些方法被调用之后，我们也需要通知
+                    addFunction(model,property,model[property])
+                }else if(model[property] instanceof Object){
+                    observerFactory(model[property])//递归
+                }
+            }
+        }
+        function addFunction(model,property,value){
+            ["push","pop","splice","shift","unshift","slice","concat","reverse","sort"].forEach(function(method){
+                var __o__ = Array.prototype[method]
+                //我们改变了数组对象的method方法
+                model[property][method] = function(){
+                    var res = __o__.apply(this,arguments)//调用__o__方法
+                    notify(model,property,model[property])
+                    return res
+                }
+            })
+        }
+        //递归函数内存管理
+        //1.有可能产生死循环创建递归的情况下，不适合用递归
+        //2.被递归的函数闭包需要消耗大量的内存的情况下，不适合用递归
+        function addObserver(model,property,value){
+            Object.defineProperty(model,property,{
+              enumerable:true,//是否可枚举
+              configurable:false,//是否以后还可以配置name属性
+              set:function reactiveSetter(nvalue){
+                value = nvalue;
+                notify(model,property,value)
+              },
+              get:function reactiveGetter(){
+                return value;
+              }
+            })
+        }
+        function notify(obj,key,value){
+            // console.log(bind[key]);
+            if(!bind[key])return;
+            bind[key].forEach(function(node){
+                if(node.cmdType==='text'){
+                    node.data = value
+                }else if(node.cmdType==='if'){
+                    if(!value){
+                        node.next = node.nextElementSibling
+                        node.remove()
+                    }else{
+                        if(node.next){
+                            node.ref.parentNode.ref.insertBefore(node,node.next)
+                        }else{
+                            node.ref.parentNode.ref.appendChild(node)
+                        }
+                    }
+                }else if(node.cmdType==='show'){
+                    if(!value){
+                        node.style.display="none"
+                    }else{
+                        node.style.display="block"
+                    }
+                }
+            })
+        }
+        observerFactory(model)
+        var bind = {}
+        function mvvm(node){
+            var clone = node.cloneNode(false)//复制节点 true代表深度克隆 false代表只克隆当前node
+            node.ref = clone//让克隆对象和模板对象的node发生关系
+            clone.ref = node
+            for(var i=0;i<node.childNodes.length;i++){
+                clone.appendChild(mvvm(node.childNodes[i]))
+            }
+            switch(node.nodeType){
+                case 1:
+                    parseElement(node)//解析元素的指令的
+                    break;
+                case 3:
+                    if(/\{\{\s*(\w+)\s*\}\}/.exec(node.data)){
+                        bind[RegExp.$1] = bind[RegExp.$1]||[]
+                        bind[RegExp.$1].push(node.ref)
+                        node.ref.cmdType = 'text'
+                    }
+                    break;
+                default:
+ 
+            }
+            return clone
+        }
+        function parseElement(element){
+            if(element.hasAttribute("v-if")){
+                var m = element.getAttribute("v-if")
+                bind[m] = bind[m]||[]
+                bind[m].push(element.ref)
+                element.ref.cmdType = 'if'
+            }else if(element.hasAttribute("v-show")){
+                var m = element.getAttribute("v-show")
+                bind[m] = bind[m]||[]
+                bind[m].push(element.ref)
+                element.ref.cmdType = 'show'
+            }
+        }
+        function init(){
+            for(var prop in model){
+                model[prop] = model[prop]
+            }
+        }
+        var app = document.getElementById("app")
+        app.remove()
+         
+        var clone = mvvm(app)//双向数据绑定
+        // model.title = "hahaha"
+        init()//渲染
+        document.body.appendChild(clone)
+        function changeTitle(){
+            model.title = title.value;
+        }
+        function changeMessage(){
+            model.message = message.value;
+        }
+        window.setTimeout(function(){
+            model.isShow=true;
+        },2000)
+    </script>
+    <input id="title">
+    <button onclick="changeTitle()">改变</button>
+    <input id="message">
+    <button onclick="changeMessage()">改变</button>
+</body>
+</html>
