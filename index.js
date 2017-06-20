@@ -1,25 +1,14 @@
 ;
 var MVVM = (function(root){
-	function MVVM(options){
-		for(key in options.data){
-			this[key] = options.data[key];
-		}
-		// console.log(this);
-		this.bind = this._init(options);
-		this._observerFactory(options.data);
-	};
+
+	var __CMDS__ = {
+
+	}
 
 
-	MVVM.prototype = {
+	var __PROTOTYPE__ = {
 		// 初始化虚拟dom
 		_init: function(options){
-			var __node__ = document.querySelector(options.el);
-			var __clone__ = __node__.cloneNode(false);
-
-			__clone__.ref = __node__;
-			
-			console.log(__clone__);
-			return;
 		},	
 
 
@@ -57,25 +46,63 @@ var MVVM = (function(root){
 
 		// 为数组添加方法
 		_addFunction: function(model, key){
-			var __functionArr__ = ["pop", "push", "shift", "splice", "unshift", "slice", "concat", "reverse", "sort"];
-			var __this__ = this;
-			__functionArr__.forEach(function(method){				
-				var __arrPro__ = Array.prototype[method];
+			var functionArr = ["pop", "push", "shift", "splice", "unshift", "slice", "concat", "reverse", "sort"];
+			var that = this;
+			functionArr.forEach(function(method){				
+				var arrPro = Array.prototype[method];
 				//改变数组对象的method方法
 				model[key][method] = function(){
-					var __res__ = __arrPro__.apply(this, arguments);
-					__this__._notify(model, key, model[key]);
-					return __res__;
+					var res = arrPro.apply(this, arguments);
+					that._notify(model, key, model[key]);
+					return res;
 				}
 			})
 		}, 
 
-
+		//通知
 		_notify: function(obj, key, value){
 			console.log(obj);
 			console.log("的"+key+"属性发生了改变，改变后的结果是"+value);
+		},
+
+
+		// 虚拟dom
+		_virtualDom: function(node){
+			var clone = node.cloneNode(false);
+			node.ref = clone;
+			clone.ref = node;
+
+			for (var i = 0; i < node.childNodes.length; i++) {
+				clone.appendChild(this._virtualDom(node.childNodes[i]));
+			};
+
+			switch (node.nodeType){
+				case 1: 
+					break;
+				case 3: 
+					break;
+				default: 				
+			}
+
+			// console.log(node);
+			// console.log(node.nodeType);
+			return clone;
 		}
 	}
+
+	var MVVM = function(options){
+		this.$bind = {};
+		this.$el = document.querySelector(options.el);
+		if(!this.$el)throw new Error("没有找到上下文");
+		for(key in options.data){
+			this[key] = options.data[key];
+		}
+		this._observerFactory(options.data);
+		this._virtualDom(this.$el);
+	};
+
+
+	MVVM.prototype = __PROTOTYPE__;
 
 
 	return MVVM;
