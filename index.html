@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>example</title>
   <script src="./index.js" charset="utf-8"></script>
-  <script type="text/javascript" src="newVue.js"></script>
+  <!--<script type="text/javascript" src="newVue.js"></script>-->
   <!--<script src="https://unpkg.com/vue/dist/vue.js" charset="utf-8"></script>-->
 </head>
 <body>
@@ -37,20 +37,20 @@ var vm = new MVVM({
 });
 
 
-var vue = new Vue({
-  el: '#mvvm',
-  data: {
-    a: 'test model',
-    b: 'hello MVVM',
-    flag: true,
-    arr: [1 ,2 ,3]
-  },
-  methods: {
-    testToggle: function () {
-      this.flag = !this.flag;
-      this.b = this.flag ? 'hello MVVM' : 'test success'
-    }
-  }
-});
+// var vue = new Vue({
+//   el: '#mvvm',
+//   data: {
+//     a: 'test model',
+//     b: 'hello MVVM',
+//     flag: true,
+//     arr: [1 ,2 ,3]
+//   },
+//   methods: {
+//     testToggle: function () {
+//       this.flag = !this.flag;
+//       this.b = this.flag ? 'hello MVVM' : 'test success'
+//     }
+//   }
+// });
 </script>
 </html>

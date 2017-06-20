@@ -80,13 +80,22 @@ var MVVM = (function(root){
 				case 1: 
 					break;
 				case 3: 
+					if (/\{\{\s*(\w+)\s*\}\}/.exec(node.data)) {
+						console.log(RegExp.$1);
+						node.ref.data = "123456";
+					}
 					break;
-				default: 				
+				default: 			
 			}
 
 			// console.log(node);
 			// console.log(node.nodeType);
 			return clone;
+		},
+
+		_init: function(clone){
+			this.$el.parentNode.appendChild(clone);
+			this.$el.remove();
 		}
 	}
 
@@ -98,7 +107,7 @@ var MVVM = (function(root){
 			this[key] = options.data[key];
 		}
 		this._observerFactory(options.data);
-		this._virtualDom(this.$el);
+		this._init(this._virtualDom(this.$el));
 	};
 
 
