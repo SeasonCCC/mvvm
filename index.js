@@ -16,6 +16,7 @@ var MVVM = (function(root){
 			var __node__ = document.querySelector(options.el);
 			var __clone__ = __node__.cloneNode(false);
 
+			__clone__.ref = __node__;
 			
 			console.log(__clone__);
 			return;
