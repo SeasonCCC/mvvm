@@ -171,11 +171,10 @@ var Vue = (function(root){
                     __CMDS__['text'].parse.call(this,node)
                     break;
                 default:
- 
             }
 
-            console.log(node);
-            console.log(node.nodeType);
+            // console.log(node);
+            // console.log(node.nodeType);
             
             return clone
         },

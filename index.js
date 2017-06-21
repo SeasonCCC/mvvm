@@ -7,15 +7,10 @@ var MVVM = (function(root){
 
 
 	var __PROTOTYPE__ = {
-		// 初始化虚拟dom
-		_init: function(options){
-		},	
-
-
 		// 观察者工厂
 		_observerFactory: function(model) {
 			for(key in model){
-				this._addObserver(this, key, this[key]);
+				this._addObserver(model, key, model[key]);
 				if (this[key] instanceof Array) {
 					//如果是数组，数组的某些方法被调用之后，我们也需要通知
 					this._addFunction(model, key);
@@ -27,6 +22,7 @@ var MVVM = (function(root){
 
 		//添加观察者
 		_addObserver: function(model, key, val) {
+			var that = this;
 			Object.defineProperty(model, key, {
 				enumerable: true,   // 可枚举
 				configurable: true, // 可重新定义
@@ -34,14 +30,15 @@ var MVVM = (function(root){
 					return val;
 				},
 				set: function(newVal){
-					if (val === newVal || (newVal !== newVal && val !== val)) {
-						return;
-					}
+					// if (val === newVal || (newVal !== newVal && val !== val)) {
+					// 	console.log("123");
+					// 	return;
+					// }
 					// console.log('数据更新啦 ', val, '=>', newVal);
 					val = newVal;
-					this._notify(model, key, val);
+					that._notify(model, key, val);
 				}
-			})		
+			})	
 		},
 
 		// 为数组添加方法
@@ -61,41 +58,52 @@ var MVVM = (function(root){
 
 		//通知
 		_notify: function(obj, key, value){
-			console.log(obj);
-			console.log("的"+key+"属性发生了改变，改变后的结果是"+value);
+			if(!this.$bind[key])return;
+			this.$bind[key].forEach(function(cloneNode){
+				if (cloneNode.cmdType == "text") {
+					cloneNode.data = value;
+				}
+			})
+
+			// console.log(obj);
+			// console.log("的"+key+"属性发生了改变，改变后的结果是"+value);
 		},
 
 
 		// 虚拟dom
 		_virtualDom: function(node){
 			var clone = node.cloneNode(false);
-			node.ref = clone;
+			// node.ref = clone;
 			clone.ref = node;
 
-			for (var i = 0; i < node.childNodes.length; i++) {
-				clone.appendChild(this._virtualDom(node.childNodes[i]));
+			for (var i = 0; i < clone.ref.childNodes.length; i++) {
+				clone.appendChild(this._virtualDom(clone.ref.childNodes[i]));
 			};
 
-			switch (node.nodeType){
+			switch (clone.ref.nodeType){
 				case 1: 
 					break;
 				case 3: 
-					if (/\{\{\s*(\w+)\s*\}\}/.exec(node.data)) {
-						console.log(RegExp.$1);
-						node.ref.data = "123456";
+					if (/\{\{\s*(\w+)\s*\}\}/.exec(clone.ref.data)) {
+						clone.cmdType = "text";
+						this.$bind[RegExp.$1] = this.$bind[RegExp.$1] || [];
+						this.$bind[RegExp.$1].push(clone);
 					}
 					break;
-				default: 			
+				default:
 			}
 
-			// console.log(node);
-			// console.log(node.nodeType);
+			// console.log(clone);
 			return clone;
 		},
 
+		// 初始化
 		_init: function(clone){
 			this.$el.parentNode.appendChild(clone);
 			this.$el.remove();
+			for(var prop in this.$data){
+				this.$data[prop] = this.$data[prop];
+			}
 		}
 	}
 
@@ -103,11 +111,15 @@ var MVVM = (function(root){
 		this.$bind = {};
 		this.$el = document.querySelector(options.el);
 		if(!this.$el)throw new Error("没有找到上下文");
-		for(key in options.data){
+
+		this._observerFactory(options.data);
+		this.$data = options.data;
+		this._init(this._virtualDom(this.$el));
+		// console.log(options.data);
+		for(var key in options.data){
 			this[key] = options.data[key];
 		}
-		this._observerFactory(options.data);
-		this._init(this._virtualDom(this.$el));
+
 	};
 
 

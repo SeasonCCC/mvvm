@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>example</title>
   <script src="./index.js" charset="utf-8"></script>
-  <!--<script type="text/javascript" src="newVue.js"></script>-->
+  <script type="text/javascript" src="newVue.js"></script>
   <!--<script src="https://unpkg.com/vue/dist/vue.js" charset="utf-8"></script>-->
 </head>
 <body>
@@ -15,10 +15,11 @@
     <input type="text" v-model="a">
     <input type="text" name="" value="" v-model="a">
     <p v-html="a"><label>{{ a }}</label></p>
-    <button type="button" name="button" v-on:click="testToggle">change b</button>
+    <button type="button" name="button" v-on:click="testToggle">{{ a }}</button>
   </div>
-</body>
-<script>
+
+
+<script type="text/javascript">
 var vm = new MVVM({
   el: '#mvvm',
   data: {
@@ -53,4 +54,5 @@ var vm = new MVVM({
 //   }
 // });
 </script>
+</body>
 </html>
