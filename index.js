@@ -62,6 +62,12 @@ var MVVM = (function(root){
 			this.$bind[key].forEach(function(cloneNode){
 				if (cloneNode.cmdType == "text") {
 					cloneNode.data = value;
+				}else if(cloneNode.cmdType == "if"){
+					if (value) {
+						cloneNode.remove();
+					} else{
+
+					}
 				}
 			})
 
@@ -73,21 +79,16 @@ var MVVM = (function(root){
 		// 虚拟dom
 		_virtualDom: function(node){
 			var clone = node.cloneNode(false);
-			// console.log(clone);
-			// node.ref = clone;
-			clone.ref = node;
-			// console.log("=============");
-			// console.log(clone.ref);
-			for (var i = 0; i < clone.ref.childNodes.length; i++) {
-				// console.log(clone.ref.childNodes[i]);
-				clone.appendChild(this._virtualDom(clone.ref.childNodes[i]));
+			for (var i = 0; i < node.childNodes.length; i++) {
+				clone.appendChild(this._virtualDom(node.childNodes[i]));
 			};
 
-			switch (clone.ref.nodeType){
+			switch (clone.nodeType){
 				case 1: 
+					this._parseElement(clone);
 					break;
 				case 3: 
-					if (/\{\{\s*(\w+)\s*\}\}/.exec(clone.ref.data)) {
+					if (/\{\{\s*(\w+)\s*\}\}/.exec(clone.data)) {
 						clone.cmdType = "text";
 						this.$bind[RegExp.$1] = this.$bind[RegExp.$1] || [];
 						this.$bind[RegExp.$1].push(clone);
@@ -95,14 +96,26 @@ var MVVM = (function(root){
 					break;
 				default:
 			}
-			// console.log(clone);
-			
-
 			return clone;
+		},
+
+
+		// 解析指令
+		_parseElement: function(element){
+			
+			if (element.hasAttribute("v-if")) {
+				element.cmdType = "if";
+				var attrVal = element.getAttribute("v-if");
+				this.$bind[attrVal] = this.$bind[attrVal] || [];
+				this.$bind[attrVal].push(element);
+			} else{
+
+			};
 		},
 
 		// 初始化
 		_init: function(clone){
+			console.log(this.$bind);
 			this.$el.parentNode.appendChild(clone);
 			this.$el.remove();
 			for(var prop in this.$data){
