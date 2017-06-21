@@ -73,10 +73,13 @@ var MVVM = (function(root){
 		// 虚拟dom
 		_virtualDom: function(node){
 			var clone = node.cloneNode(false);
+			// console.log(clone);
 			// node.ref = clone;
 			clone.ref = node;
-
+			// console.log("=============");
+			// console.log(clone.ref);
 			for (var i = 0; i < clone.ref.childNodes.length; i++) {
+				// console.log(clone.ref.childNodes[i]);
 				clone.appendChild(this._virtualDom(clone.ref.childNodes[i]));
 			};
 
@@ -92,8 +95,9 @@ var MVVM = (function(root){
 					break;
 				default:
 			}
-
 			// console.log(clone);
+			
+
 			return clone;
 		},
 
