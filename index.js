@@ -189,12 +189,8 @@ var MVVM = (function(root){
 
 		this._observerFactory(options.data);
 		this.$data = options.data;
+		// Object.assign(this, options.data);
 		this._init(this._virtualDom(this.$el));
-		// console.log(options.data);
-		// for(var key in options.data){
-		// 	this[key] = options.data[key];
-		// }
-
 	};
 
 
