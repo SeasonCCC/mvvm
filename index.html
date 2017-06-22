@@ -14,7 +14,7 @@
     <h2><p>{{b}}</p></h2>
     <input type="text" v-if="flag" />
     <input type="text" name="" value="" v-model="a" />
-    <p v-html="a"><label>{{ a }}</label></p>
+    <p v-show="flag"><label>{{ a }}</label></p>
     <button type="button" name="button" v-on:click="testToggle">{{ a }}</button>
   </div>
 
